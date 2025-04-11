@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Summarizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #7C3AED;
+            --background: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text: #1E293B;
+            --border: #E2E8F0;
+            --error: #EF4444;
+            --success: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .form-section {
+            background: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .form-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-upload {
+            position: relative;
+            padding: 2rem;
+            border: 2px dashed var(--border);
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .radio-group, .select-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #4338CA;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-list {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748B;
+        }
+
+        .selected-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .file-tag {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-tag i {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2><i class="fas fa-file-alt"></i> Document Summarizer</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas fa-{% if category == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form action="{{ url_for('summarize') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-section">
+                <h3>Upload Files</h3>
+                
+                <div class="file-upload">
+                    <i class="fas fa-file-pdf"></i>
+                    <p>Drop files here or click to browse</p>
+                    <input type="file" name="pdf_files" accept="application/pdf" multiple>
+                    <div class="selected-files" id="pdf-files"></div>
+                </div>
+                
+                <div class="file-upload">
+                    <i class="fas fa-file-word"></i>
+                    <p>Drop files here or click to browse</p>
+                    <input type="file" name="docx_files" accept=".docx" multiple>
+                    <div class="selected-files" id="docx-files"></div>
+                </div>
+                
+                <div class="file-upload">
+                    <i class="fas fa-file-alt"></i>
+                    <p>Drop files here or click to browse</p>
+                    <input type="file" name="txt_files" accept=".txt" multiple>
+                    <div class="selected-files" id="txt-files"></div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Summarization Options</h3>
+                
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="summary_type" value="Abstractive" checked>
+                        <i class="fas fa-brain"></i>
+                        Abstractive
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="summary_type" value="Extractive">
+                        <i class="fas fa-quote-right"></i>
+                        Extractive
+                    </label>
+                </div>
+                
+                <div class="select-group">
+                    <select name="summary_length">
+                        <option value="Short">Short Summary</option>
+                        <option value="Medium">Medium Summary</option>
+                        <option value="Big">Detailed Summary</option>
+                    </select>
+                </div>
+                
+                <input type="text" name="keywords" placeholder="Enter keywords (optional, separate with commas)">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-magic"></i>
+                Generate Summary
+            </button>
+        </form>
+        
+        <div class="form-section">
+            <h3>Feedback</h3>
+            <form action="{{ url_for('feedback') }}" method="POST">
+                <textarea name="feedback" placeholder="Help us improve! Share your experience with our summarization tool..."></textarea>
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Feedback
+                </button>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <a href="{{ url_for('logout') }}">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Handle file selection display
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileList = this.files;
+                const container = this.parentElement.querySelector('.selected-files');
+                container.innerHTML = '';
+                
+                Array.from(fileList).forEach(file => {
+                    const fileTag = document.createElement('div');
+                    fileTag.className = 'file-tag';
+                    fileTag.innerHTML = `
+                        <i class="fas fa-file"></i>
+                        ${file.name}
+                        <i class="fas fa-times"></i>
+                    `;
+                    container.appendChild(fileTag);
+                });
+            });
+        });
+
+        // Handle drag and drop highlighting
+        document.querySelectorAll('.file-upload').forEach(upload => {
+            upload.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--primary)';
+                this.style.background = 'rgba(79, 70, 229, 0.05)';
+            });
+
+            upload.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--border)';
+                this.style.background = 'transparent';
+            });
+
+            upload.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--border)';
+                this.style.background = 'transparent';
+            });
+        });
+    </script>
+</body>
+</html>
